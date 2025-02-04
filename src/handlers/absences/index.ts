@@ -101,7 +101,7 @@ const names = [
   },
 ];
 
-import getRandomInteger from "../../utils/randomInteger";
+import getRandomInteger from "../../utils/randomInteger/";
 
 const startOf2020 = 1577836800000;
 

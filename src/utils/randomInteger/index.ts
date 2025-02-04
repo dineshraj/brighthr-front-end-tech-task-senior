@@ -1,4 +1,4 @@
-export function mulberry32(a) {
+export function mulberry32(a: number) {
   return function () {
     var t = (a += 0x6d2b79f5);
     t = Math.imul(t ^ (t >>> 15), t | 1);
@@ -9,7 +9,7 @@ export function mulberry32(a) {
 
 const random = mulberry32(42);
 
-function getRandomInteger(max) {
+function getRandomInteger(max: number) {
   return Math.floor(random() * max);
 }
 
