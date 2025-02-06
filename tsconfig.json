@@ -1,13 +1,15 @@
 {
   "compilerOptions": {
     "jsx": "react-jsx",
-    "moduleResolution": "node",
+    "moduleResolution": "node10",
     "module": "esnext",
     "strict": true,
+    "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
+    "moduleDetection": "force",
     "allowImportingTsExtensions": true,
     "noEmit": true
   },
-  "include": ["src", "test/App.test.tsx", "test/setup.ts"]
+  "include": ["src", "test"]
 }

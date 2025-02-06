@@ -2,27 +2,44 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 
 import App from '../src/App';
+import { AbsenseData } from '../src/types';
 
-const mockAbsenceData = [
+const mockAbsenceData: AbsenseData[] = [
   {
-    firstName: 'Jabez',
-    lastName: 'Nasser',
-    id: '24a9352b-cf35-4e00-b4c9-403546d7bea8'
+    id: 0,
+    startDate: '2022-05-28T04:39:06.470Z',
+    days: 9,
+    absenceType: 'SICKNESS',
+    employee: {
+      firstName: 'Rahaf',
+      lastName: 'Deckard',
+      id: '2ea05a52-4e31-450d-bbc4-5a6c73167d17'
+    },
+    approved: true
   },
   {
-    firstName: 'Isla',
-    lastName: 'Watts',
-    id: '08335a8f-1b4f-4d9b-82a8-46fa20d48f2d'
+    id: 1,
+    startDate: '2022-02-08T08:02:47.543Z',
+    days: 5,
+    absenceType: 'ANNUAL_LEAVE',
+    employee: {
+      firstName: 'Enya',
+      lastName: 'Behm',
+      id: '84502153-69e6-4561-b2de-8f21f97530d3'
+    },
+    approved: true
   },
   {
-    firstName: 'Malaysia',
-    lastName: 'Krueger',
-    id: 'f1128070-8fc9-4ccb-8657-f5e1c7cacad9'
-  },
-  {
-    firstName: 'Kylei',
-    lastName: 'Castanon',
-    id: '8d0593d5-de4a-48c9-afa5-55127c0d349d'
+    id: 2,
+    startDate: '2020-12-31T03:08:19.146Z',
+    days: 18,
+    absenceType: 'ANNUAL_LEAVE',
+    employee: {
+      firstName: 'Amiah',
+      lastName: 'Fenton',
+      id: '6ebff517-f398-4d23-9ed3-a0f14bfa3858'
+    },
+    approved: true
   }
 ];
 
@@ -42,9 +59,14 @@ describe('App', () => {
     expect(screen.getByTestId('app')).toBeInTheDocument();
   });
 
-  it('fetches the absence data from  the server', async () => {
+  it('fetches the absence data from the server', async () => {
     render(<App />);
 
-    expect(false).toBe(true);
+    expect(fetch).toHaveBeenCalledWith(
+      'https://front-end-kata.brighthr.workers.dev/api/absences'
+    );
+
+    const absenceItems = await screen.findAllByTestId('absence-item');
+    expect(absenceItems).toHaveLength(mockAbsenceData.length);
   });
 });
