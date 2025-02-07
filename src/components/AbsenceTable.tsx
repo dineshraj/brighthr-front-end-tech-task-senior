@@ -1,7 +1,11 @@
-import { AbsenseData } from '../types';
+import { AbsenceData } from '../types';
 
-interface AbsenseDataProps {
-  absenseData: AbsenseData[];
+import '../style/AbsenceTable.css';
+import useFetch from '../hooks/useFetch';
+import Conflict from './Conflict';
+
+interface AbsenceDataProps {
+  absenceData: AbsenceData[];
 }
 
 const formatDate = (isoDate: string) => {
@@ -26,44 +30,67 @@ const formatDate = (isoDate: string) => {
   };
 
   return `${day}${daySuffix(day)} ${month} ${year}`;
-}
+};
 
 const calculateEndDate = (date: string, days: number) => {
   const result = new Date(date);
   result.setDate(result.getDate() + days);
   return formatDate(result.toISOString());
-}
+};
 
-const AbsenceTable = ({ absenseData }: AbsenseDataProps) => {
-  if (absenseData.length) {
+const checkConflict = async (id: number) => {
+  const response = await fetch(
+    `https://front-end-kata.brighthr.workers.dev/api/conflict/${id}`
+  );
+  const data = await response.json();
+  return data;
+};
+
+const AbsenceTable = ({ absenceData }: AbsenceDataProps) => {
+  if (absenceData.length) {
+    // const naiveArray = [];
+    
+    // absenceData.map((absence) => {
+    //   const c = checkConflict(absence.id);
+    //   naiveArray.push({
+    //     id: absence.id,
+    //     conflict: c,
+    //   });
+    // });
+    // console.log("🚀 ~ AbsenceTable ~ naiveArray:", naiveArray)
+
     return (
-      <table data-testid="absenses">
+      <table data-testid="absences" className="absences">
         <thead>
           <tr>
             <th>Employee</th>
-            <th>Absense Type</th>
+            <th>Absence Type</th>
             <th>Start Date</th>
             <th>End Date</th>
             <th>Approved</th>
           </tr>
         </thead>
         <tbody>
-          {absenseData.map((absense) => (
-            <tr key={absense.id} data-testid="absence-item">
-              <td>
-                {absense.employee.firstName} {absense.employee.lastName}
-              </td>
-              <td>{absense.absenceType}</td>
-              <td>{formatDate(absense.startDate)}</td>
-              <td>{calculateEndDate(absense.startDate, absense.days)}</td>
-              <td>{absense.approved ? 'Yes' : 'Pending'}</td>
-            </tr>
-          ))}
+          {absenceData.map((absence) => {
+            return (
+              <>
+                <tr key={absence.id} data-testid="absence-item">
+                  <td>
+                    {absence.employee.firstName} {absence.employee.lastName}
+                  </td>
+                  <td>{absence.absenceType}</td>
+                  <td>{formatDate(absence.startDate)}</td>
+                  <td>{calculateEndDate(absence.startDate, absence.days)}</td>
+                  <td>{absence.approved ? 'Yes' : 'Pending'}</td>
+                </tr>
+              </>
+            );
+          })}
         </tbody>
       </table>
     );
   }
-  return <div>No absenses found</div>;
+  return <div>No absences found</div>;
 };
 
 export default AbsenceTable;

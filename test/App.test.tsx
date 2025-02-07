@@ -1,10 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 
 import App from '../src/App';
-import { AbsenseData } from '../src/types';
+import { AbsenceData } from '../src/types';
 
-const mockAbsenceData: AbsenseData[] = [
+const mockAbsenceData: AbsenceData[] = [
   {
     id: 0,
     startDate: '2022-05-28T04:39:06.470Z',
@@ -13,9 +13,9 @@ const mockAbsenceData: AbsenseData[] = [
     employee: {
       firstName: 'Rahaf',
       lastName: 'Deckard',
-      id: '2ea05a52-4e31-450d-bbc4-5a6c73167d17'
+      id: '2ea05a52-4e31-450d-bbc4-5a6c73167d17',
     },
-    approved: true
+    approved: true,
   },
   {
     id: 1,
@@ -25,9 +25,9 @@ const mockAbsenceData: AbsenseData[] = [
     employee: {
       firstName: 'Enya',
       lastName: 'Behm',
-      id: '84502153-69e6-4561-b2de-8f21f97530d3'
+      id: '84502153-69e6-4561-b2de-8f21f97530d3',
     },
-    approved: true
+    approved: true,
   },
   {
     id: 2,
@@ -37,36 +37,75 @@ const mockAbsenceData: AbsenseData[] = [
     employee: {
       firstName: 'Amiah',
       lastName: 'Fenton',
-      id: '6ebff517-f398-4d23-9ed3-a0f14bfa3858'
+      id: '6ebff517-f398-4d23-9ed3-a0f14bfa3858',
     },
-    approved: true
-  }
+    approved: true,
+  },
 ];
 
 describe('App', () => {
   beforeEach(() => {
-    vi.spyOn(global, 'fetch').mockResolvedValue({
-      json: vi.fn().mockResolvedValue(mockAbsenceData)
+    vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+      json: vi.fn().mockResolvedValue(mockAbsenceData),
     } as unknown as Response);
+
+  //   vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+  //     json: vi.fn().mockResolvedValue({
+  //       conflicts: true,
+  //     }),
+  //   } as unknown as Response);
+
+  //   vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+  //     json: vi.fn().mockResolvedValue({
+  //       conflicts: false,
+  //     }),
+  //   } as unknown as Response);
+
+  //   vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+  //     json: vi.fn().mockResolvedValue({
+  //       conflicts: true,
+  //     }),
+  //   } as unknown as Response);
   });
 
   afterEach(() => {
     vi.resetAllMocks();
   });
 
-  it('should render the App', () => {
+  it('should render the App', async () => {
     render(<App />);
-    expect(screen.getByTestId('app')).toBeInTheDocument();
+
+    const appContainer = await screen.findByTestId('app');
+    expect(appContainer).toBeInTheDocument();
   });
 
-  it('fetches the absence data from the server', async () => {
-    render(<App />);
+  describe('absenses', () => {
+    it('fetches the absence data from the server', async () => {
+      render(<App />);
 
-    expect(fetch).toHaveBeenCalledWith(
-      'https://front-end-kata.brighthr.workers.dev/api/absences'
-    );
+      expect(fetch).toHaveBeenCalledWith(
+        'https://front-end-kata.brighthr.workers.dev/api/absences'
+      );
 
-    const absenceItems = await screen.findAllByTestId('absence-item');
-    expect(absenceItems).toHaveLength(mockAbsenceData.length);
+      const absenceItems = await screen.findAllByTestId('absence-item');
+      expect(absenceItems).toHaveLength(mockAbsenceData.length);
+    });
+  });
+  describe.skip('conflicts', () => {
+    it('fetches the conflicts for each user', async () => {
+      render(<App />);
+
+      await waitFor(() => {
+        expect(fetch).toHaveBeenCalledWith(
+          'https://front-end-kata.brighthr.workers.dev/api/conflicts/2ea05a52-4e31-450d-bbc4-5a6c73167d17'
+        );
+        expect(fetch).toHaveBeenCalledWith(
+          'https://front-end-kata.brighthr.workers.dev/api/conflicts/84502153-69e6-4561-b2de-8f21f97530d3'
+        );
+        expect(fetch).toHaveBeenCalledWith(
+          'https://front-end-kata.brighthr.workers.dev/api/conflicts/6ebff517-f398-4d23-9ed3-a0f14bfa3858'
+        );
+      })
+    })
   });
 });

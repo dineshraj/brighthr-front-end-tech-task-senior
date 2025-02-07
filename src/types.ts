@@ -1,4 +1,4 @@
-export interface AbsenseData {
+export interface AbsenceData {
   id: number;
   startDate: string;
   days: number;
@@ -9,4 +9,8 @@ export interface AbsenseData {
     id: string;
   };
   approved: boolean;
+}
+
+export interface Conflicts {
+  conflicts: boolean;
 }

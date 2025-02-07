@@ -1,0 +1,14 @@
+th {
+  text-align: left;
+  padding: 15px;
+  background-color: beige;
+
+}
+
+td {
+  padding: 5px;
+}
+
+.absences {
+  width: 100%;
+}

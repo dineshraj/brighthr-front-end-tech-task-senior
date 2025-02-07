@@ -2,9 +2,9 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 
 import AbsenceTable from '../src/components/AbsenceTable';
-import { AbsenseData } from '../src/types';
+import { AbsenceData } from '../src/types';
 
-const mockAbsenceData: AbsenseData[] = [
+const mockAbsenceData: AbsenceData[] = [
   {
     id: 0,
     startDate: '2022-05-28T04:39:06.470Z',
@@ -45,14 +45,14 @@ const mockAbsenceData: AbsenseData[] = [
 
 describe('Table', () => {
 
-  it('displays a message when there are no absenses', () => {
-    render(<AbsenceTable absenseData={[]} />);
-    expect(screen.getByText('No absenses found')).toBeInTheDocument();
+  it('displays a message when there are no absences', () => {
+    render(<AbsenceTable absenceData={[]} />);
+    expect(screen.getByText('No absences found')).toBeInTheDocument();
   });
 
   it('displays the absense data', () => {
-    render(<AbsenceTable absenseData={mockAbsenceData} />);
-    const absenseTable = screen.getByTestId('absenses');
+    render(<AbsenceTable absenceData={mockAbsenceData} />);
+    const absenseTable = screen.getByTestId('absences');
 
     expect(absenseTable).toBeInTheDocument();
 
