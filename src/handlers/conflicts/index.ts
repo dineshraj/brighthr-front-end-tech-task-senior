@@ -22,8 +22,3 @@ const Conflicts = (request: RequestLike) => {
 };
 
 export default Conflicts;
-
-[{
-  employeeId: '',
-  conflictingAbsenses: [[3, 4, 5], [7, 8]]
-}]

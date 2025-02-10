@@ -1,8 +1,6 @@
 import { AbsenceData, Conflict } from '../types';
 
 import '../style/AbsenceTable.css';
-import { C } from 'vitest/dist/chunks/environment.d8YfPkTm';
-import { MouseEventHandler } from 'react';
 interface AbsenceDataProps {
   absenceData: AbsenceData[];
   conflicts: Conflict[];

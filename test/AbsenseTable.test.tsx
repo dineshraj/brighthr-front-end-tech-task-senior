@@ -73,12 +73,12 @@ const renderAbsenceTable = (sortMethod = () => {}) => {
 describe('Table', () => {
   it('renders the component', () => {
     renderAbsenceTable();
-    const absenseTable = screen.getByTestId('absences');
+    const absenceTable = screen.getByTestId('absences');
 
-    expect(absenseTable).toBeInTheDocument;
+    expect(absenceTable).toBeInTheDocument;
   });
 
-  it('displays the absense headings', () => {
+  it('displays the absence headings', () => {
     renderAbsenceTable();
 
     expect(screen.getByText('Employee')).toBeInTheDocument();
@@ -88,11 +88,11 @@ describe('Table', () => {
     expect(screen.getByText('Approved')).toBeInTheDocument;
   });
 
-  it('displays the absense data', () => {
+  it('displays the absence data', () => {
     renderAbsenceTable();
-    const absenseTable = screen.getByTestId('absences');
+    const absenceTable = screen.getByTestId('absences');
 
-    expect(absenseTable).toBeInTheDocument();
+    expect(absenceTable).toBeInTheDocument();
 
     expect(screen.getByText('Rahaf Deckard')).toBeInTheDocument();
     expect(screen.getByText('Enya Behm')).toBeInTheDocument();

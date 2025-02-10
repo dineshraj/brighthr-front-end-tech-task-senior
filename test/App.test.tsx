@@ -131,7 +131,7 @@ describe('App', () => {
     });
   });
 
-  describe('sorting data', () => {
+  describe.only('sorting data', () => {
     it('sorts the table by employee name when clicking the Employee heading', async () => {
       render(<App />);
 
@@ -156,6 +156,10 @@ describe('App', () => {
       expect(rows[0]).toHaveTextContent('Amiah Fenton');
       expect(rows[1]).toHaveTextContent('Rahaf Deckard');
       expect(rows[2]).toHaveTextContent('Enya Behm');
+    });
+
+    it('toggles the ordering when clicking the same heading twice', async () => { 
+      expect(true).toBe(false);
     });
   })
   

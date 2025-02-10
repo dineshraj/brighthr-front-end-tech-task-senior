@@ -6,8 +6,7 @@ const App = () => {
   const { isLoading, absences, setAbsences } = useAbsenceFetch();
   const conflicts: Conflict[] = useConflictsFetch(absences);
 
-  const handleSort = (key: HTMLElement) => {
-    console.log('hellooo', key);
+  const handleSort = (key: string) => {
     
     const sortedAbsences = [...absences].sort((a, b) => {
       return a.employee.firstName.localeCompare(b.employee.firstName);
