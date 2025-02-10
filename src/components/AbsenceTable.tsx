@@ -1,11 +1,12 @@
-import { AbsenceData } from '../types';
+import { AbsenceData, Conflict } from '../types';
 
 import '../style/AbsenceTable.css';
-import useFetch from '../hooks/useFetch';
-import Conflict from './Conflict';
-
+import { C } from 'vitest/dist/chunks/environment.d8YfPkTm';
+import { MouseEventHandler } from 'react';
 interface AbsenceDataProps {
   absenceData: AbsenceData[];
+  conflicts: Conflict[];
+  sortTable: (key: string) => void;
 }
 
 const formatDate = (isoDate: string) => {
@@ -38,59 +39,48 @@ const calculateEndDate = (date: string, days: number) => {
   return formatDate(result.toISOString());
 };
 
-const checkConflict = async (id: number) => {
-  const response = await fetch(
-    `https://front-end-kata.brighthr.workers.dev/api/conflict/${id}`
+const AbsenceTable = ({
+  absenceData,
+  conflicts,
+  sortTable,
+}: AbsenceDataProps) => {
+  const sortBy = ({ target }) => {
+    const text = (target as HTMLElement).textContent;
+    if (text) sortTable(text);
+  };
+
+  return (
+    <table data-testid="absences" className="absences">
+      <thead>
+        <tr>
+          <th onClick={sortBy}>Employee</th>
+          <th onClick={sortBy}>Absence Type</th>
+          <th onClick={sortBy}>Start Date</th>
+          <th onClick={sortBy}>End Date</th>
+          <th onClick={sortBy}>Approved</th>
+        </tr>
+      </thead>
+      <tbody>
+        {absenceData.map((absence) => {
+          const hasConflict = conflicts.find(
+            (conflict) => conflict.id === absence.id && conflict.conflict
+          );
+          const style = hasConflict ? { backgroundColor: '#f1a5a5' } : {};
+          return (
+            <tr key={absence.id} data-testid="absence-item" style={style}>
+              <td>
+                {absence.employee.firstName} {absence.employee.lastName}
+              </td>
+              <td>{absence.absenceType}</td>
+              <td>{formatDate(absence.startDate)}</td>
+              <td>{calculateEndDate(absence.startDate, absence.days)}</td>
+              <td>{absence.approved ? 'Yes' : 'Pending'}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
   );
-  const data = await response.json();
-  return data;
-};
-
-const AbsenceTable = ({ absenceData }: AbsenceDataProps) => {
-  if (absenceData.length) {
-    // const naiveArray = [];
-    
-    // absenceData.map((absence) => {
-    //   const c = checkConflict(absence.id);
-    //   naiveArray.push({
-    //     id: absence.id,
-    //     conflict: c,
-    //   });
-    // });
-    // console.log("🚀 ~ AbsenceTable ~ naiveArray:", naiveArray)
-
-    return (
-      <table data-testid="absences" className="absences">
-        <thead>
-          <tr>
-            <th>Employee</th>
-            <th>Absence Type</th>
-            <th>Start Date</th>
-            <th>End Date</th>
-            <th>Approved</th>
-          </tr>
-        </thead>
-        <tbody>
-          {absenceData.map((absence) => {
-            return (
-              <>
-                <tr key={absence.id} data-testid="absence-item">
-                  <td>
-                    {absence.employee.firstName} {absence.employee.lastName}
-                  </td>
-                  <td>{absence.absenceType}</td>
-                  <td>{formatDate(absence.startDate)}</td>
-                  <td>{calculateEndDate(absence.startDate, absence.days)}</td>
-                  <td>{absence.approved ? 'Yes' : 'Pending'}</td>
-                </tr>
-              </>
-            );
-          })}
-        </tbody>
-      </table>
-    );
-  }
-  return <div>No absences found</div>;
 };
 
 export default AbsenceTable;

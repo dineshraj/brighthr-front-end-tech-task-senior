@@ -1,5 +1,7 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+
+import userEvent from '@testing-library/user-event';
 
 import AbsenceTable from '../src/components/AbsenceTable';
 import { AbsenceData } from '../src/types';
@@ -43,15 +45,51 @@ const mockAbsenceData: AbsenceData[] = [
   },
 ];
 
-describe('Table', () => {
+const mockConflicts = [
+  {
+    id: 0,
+    conflict: false,
+  },
+  {
+    id: 1,
+    conflict: true,
+  },
+  {
+    id: 2,
+    conflict: false,
+  },
+];
 
-  it('displays a message when there are no absences', () => {
-    render(<AbsenceTable absenceData={[]} />);
-    expect(screen.getByText('No absences found')).toBeInTheDocument();
+const renderAbsenceTable = (sortMethod = () => {}) => {
+  render(
+    <AbsenceTable
+      absenceData={mockAbsenceData}
+      conflicts={mockConflicts}
+      sortTable={sortMethod}
+    />
+  );
+};
+
+describe('Table', () => {
+  it('renders the component', () => {
+    renderAbsenceTable();
+    const absenseTable = screen.getByTestId('absences');
+
+    expect(absenseTable).toBeInTheDocument;
+  });
+
+  it('displays the absense headings', () => {
+    renderAbsenceTable();
+
+    expect(screen.getByText('Employee')).toBeInTheDocument();
+    expect(screen.getByText('Absence Type')).toBeInTheDocument();
+    expect(screen.getByText('Start Date')).toBeInTheDocument();
+    expect(screen.getByText('End Date')).toBeInTheDocument();
+    expect(screen.getByText('Approved')).toBeInTheDocument;
   });
 
   it('displays the absense data', () => {
-    render(<AbsenceTable absenceData={mockAbsenceData} />);
+    renderAbsenceTable();
     const absenseTable = screen.getByTestId('absences');
 
     expect(absenseTable).toBeInTheDocument();
@@ -65,19 +103,47 @@ describe('Table', () => {
     expect(screen.getByText('GARDENING_LEAVE')).toBeInTheDocument();
 
     expect(screen.getByText('28th May 2022')).toBeInTheDocument();
-    expect(
-      screen.getByText('8th February 2022')
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText('31st December 2020')
-    ).toBeInTheDocument();
+    expect(screen.getByText('8th February 2022')).toBeInTheDocument();
+    expect(screen.getByText('31st December 2020')).toBeInTheDocument();
 
     expect(screen.getByText('6th June 2022')).toBeInTheDocument();
-    expect(
-      screen.getByText('13th February 2022')
-    ).toBeInTheDocument();
+    expect(screen.getByText('13th February 2022')).toBeInTheDocument();
     expect(screen.getByText('18th January 2021')).toBeInTheDocument();
 
     expect(screen.getAllByText('Yes')).toHaveLength(3);
+  });
+
+  it('highlights any rows that have conflicts', () => {
+    renderAbsenceTable();
+
+    const rows = screen.getAllByTestId('absence-item');
+
+    expect(rows[0]).not.toHaveStyle('background-color: #f1a5a5');
+    expect(rows[1]).toHaveStyle('background-color: #f1a5a5');
+    expect(rows[2]).not.toHaveStyle('background-color: #f1a5a5');
+  });
+
+  describe('sorting data', () => {
+    it('calls the sorting method with the right param when sorting', async () => {
+      const sortMethodMock = vi.fn();
+      renderAbsenceTable(sortMethodMock);
+
+      const employeeHeading = await screen.findByText('Employee');
+      const AbsenceTypeHeading = await screen.findByText('Absence Type');
+      const startDateHeading = await screen.findByText('Start Date');
+      const endDateHeading = await screen.findByText('End Date');
+
+      await userEvent.click(employeeHeading);
+      await userEvent.click(AbsenceTypeHeading);
+      await userEvent.click(startDateHeading);
+      await userEvent.click(endDateHeading);
+
+      expect(sortMethodMock).toHaveBeenCalledTimes(4);
+
+      expect(sortMethodMock).toHaveBeenCalledWith('Employee');
+      expect(sortMethodMock).toHaveBeenCalledWith('Absence Type');
+      expect(sortMethodMock).toHaveBeenCalledWith('Start Date');
+      expect(sortMethodMock).toHaveBeenCalledWith('End Date');
+    });
   });
 });

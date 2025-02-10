@@ -11,6 +11,7 @@ export interface AbsenceData {
   approved: boolean;
 }
 
-export interface Conflicts {
-  conflicts: boolean;
+export interface Conflict {
+  id: number;
+  conflict: boolean;
 }

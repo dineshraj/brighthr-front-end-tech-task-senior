@@ -1,6 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 
+import userEvent from '@testing-library/user-event';
+
 import App from '../src/App';
 import { AbsenceData } from '../src/types';
 
@@ -43,29 +45,29 @@ const mockAbsenceData: AbsenceData[] = [
   },
 ];
 
+global.fetch = vi.fn();
+
 describe('App', () => {
   beforeEach(() => {
-    vi.spyOn(global, 'fetch').mockResolvedValueOnce({
-      json: vi.fn().mockResolvedValue(mockAbsenceData),
-    } as unknown as Response);
-
-  //   vi.spyOn(global, 'fetch').mockResolvedValueOnce({
-  //     json: vi.fn().mockResolvedValue({
-  //       conflicts: true,
-  //     }),
-  //   } as unknown as Response);
-
-  //   vi.spyOn(global, 'fetch').mockResolvedValueOnce({
-  //     json: vi.fn().mockResolvedValue({
-  //       conflicts: false,
-  //     }),
-  //   } as unknown as Response);
-
-  //   vi.spyOn(global, 'fetch').mockResolvedValueOnce({
-  //     json: vi.fn().mockResolvedValue({
-  //       conflicts: true,
-  //     }),
-  //   } as unknown as Response);
+    vi.spyOn(global, 'fetch')
+      .mockResolvedValueOnce({
+        json: vi.fn().mockResolvedValue(mockAbsenceData),
+      } as unknown as Response)
+      .mockResolvedValueOnce({
+        json: vi.fn().mockResolvedValue({
+          conflicts: true,
+        }),
+      } as unknown as Response)
+      .mockResolvedValueOnce({
+        json: vi.fn().mockResolvedValue({
+          conflicts: false,
+        }),
+      } as unknown as Response)
+      .mockResolvedValueOnce({
+        json: vi.fn().mockResolvedValue({
+          conflicts: false,
+        }),
+      } as unknown as Response);
   });
 
   afterEach(() => {
@@ -79,7 +81,7 @@ describe('App', () => {
     expect(appContainer).toBeInTheDocument();
   });
 
-  describe('absenses', () => {
+  describe('absences', () => {
     it('fetches the absence data from the server', async () => {
       render(<App />);
 
@@ -91,21 +93,70 @@ describe('App', () => {
       expect(absenceItems).toHaveLength(mockAbsenceData.length);
     });
   });
-  describe.skip('conflicts', () => {
+  describe('conflicts', () => {
     it('fetches the conflicts for each user', async () => {
       render(<App />);
 
       await waitFor(() => {
         expect(fetch).toHaveBeenCalledWith(
-          'https://front-end-kata.brighthr.workers.dev/api/conflicts/2ea05a52-4e31-450d-bbc4-5a6c73167d17'
+          'https://front-end-kata.brighthr.workers.dev/api/absences'
         );
         expect(fetch).toHaveBeenCalledWith(
-          'https://front-end-kata.brighthr.workers.dev/api/conflicts/84502153-69e6-4561-b2de-8f21f97530d3'
+          'https://front-end-kata.brighthr.workers.dev/api/conflict/0'
         );
         expect(fetch).toHaveBeenCalledWith(
-          'https://front-end-kata.brighthr.workers.dev/api/conflicts/6ebff517-f398-4d23-9ed3-a0f14bfa3858'
+          'https://front-end-kata.brighthr.workers.dev/api/conflict/1'
         );
-      })
-    })
+        expect(fetch).toHaveBeenCalledWith(
+          'https://front-end-kata.brighthr.workers.dev/api/conflict/2'
+        );
+      });
+    });
+
+    it('does not fetch conflicts if there are no absences', async () => {
+      vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+        json: vi.fn().mockResolvedValue([]),
+      } as unknown as Response);
+
+      render(<App />);
+
+      await waitFor(() => {
+        expect(fetch).toHaveBeenCalledWith(
+          'https://front-end-kata.brighthr.workers.dev/api/absences'
+        );
+        expect(fetch).not.toHaveBeenCalledWith(
+          'https://front-end-kata.brighthr.workers.dev/api/conflict/0'
+        );
+      });
+    });
   });
+
+  describe('sorting data', () => {
+    it('sorts the table by employee name when clicking the Employee heading', async () => {
+      render(<App />);
+
+      const employeeHeading = await screen.findByText('Employee');
+      await userEvent.click(employeeHeading);
+
+      const rows = screen.getAllByTestId('absence-item');
+
+      expect(rows[0]).toHaveTextContent('Amiah Fenton');
+      expect(rows[1]).toHaveTextContent('Enya Behm');
+      expect(rows[2]).toHaveTextContent('Rahaf Deckard');
+    });
+
+    it('sorts the table by absence type when clicking the Absence Type heading', async () => {
+      render(<App />);
+
+      const absenceTypeHeading = await screen.findByText('Absence Type');
+      await userEvent.click(absenceTypeHeading);
+
+      const rows = screen.getAllByTestId('absence-item');
+
+      expect(rows[0]).toHaveTextContent('Amiah Fenton');
+      expect(rows[1]).toHaveTextContent('Rahaf Deckard');
+      expect(rows[2]).toHaveTextContent('Enya Behm');
+    });
+  })
+  
 });

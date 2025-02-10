@@ -2,6 +2,11 @@ th {
   text-align: left;
   padding: 15px;
   background-color: beige;
+}
+
+th:before {
+  content: "↕";
+  
 
 }
 
