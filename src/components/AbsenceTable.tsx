@@ -42,7 +42,7 @@ const AbsenceTable = ({
   conflicts,
   sortTable,
 }: AbsenceDataProps) => {
-  const sortBy = ({ target }) => {
+  const sortBy = ({ target }: React.MouseEvent<HTMLTableCellElement>) => {
     const text = (target as HTMLElement).textContent;
     if (text) sortTable(text);
   };
