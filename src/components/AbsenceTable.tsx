@@ -1,9 +1,9 @@
-import { AbsenceData, Conflict } from '../types';
+import { AbsenceData } from '../types';
+import calculateEndDate from '../helpers/calculateEndDate';
 
 import '../style/AbsenceTable.css';
 interface AbsenceDataProps {
   absenceData: AbsenceData[];
-  conflicts: Conflict[];
   sortTable: (key: string) => void;
 }
 
@@ -31,17 +31,8 @@ const formatDate = (isoDate: string) => {
   return `${day}${daySuffix(day)} ${month} ${year}`;
 };
 
-const calculateEndDate = (date: string, days: number) => {
-  const result = new Date(date);
-  result.setDate(result.getDate() + days);
-  return formatDate(result.toISOString());
-};
+const AbsenceTable = ({ absenceData, sortTable }: AbsenceDataProps) => {
 
-const AbsenceTable = ({
-  absenceData,
-  conflicts,
-  sortTable,
-}: AbsenceDataProps) => {
   const sortBy = ({ target }: React.MouseEvent<HTMLTableCellElement>) => {
     const text = (target as HTMLElement).textContent;
     if (text) sortTable(text);
@@ -60,10 +51,10 @@ const AbsenceTable = ({
       </thead>
       <tbody>
         {absenceData.map((absence) => {
-          const hasConflict = conflicts.find(
-            (conflict) => conflict.id === absence.id && conflict.conflict
-          );
+
+          const hasConflict = absence.conflict;
           const style = hasConflict ? { backgroundColor: '#f1a5a5' } : {};
+
           return (
             <tr key={absence.id} data-testid="absence-item" style={style}>
               <td>
@@ -71,7 +62,7 @@ const AbsenceTable = ({
               </td>
               <td>{absence.absenceType}</td>
               <td>{formatDate(absence.startDate)}</td>
-              <td>{calculateEndDate(absence.startDate, absence.days)}</td>
+              <td>{formatDate(calculateEndDate(absence.startDate, absence.days).toISOString())}</td>
               <td>{absence.approved ? 'Yes' : 'Pending'}</td>
             </tr>
           );

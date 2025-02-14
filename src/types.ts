@@ -9,9 +9,5 @@ export interface AbsenceData {
     id: string;
   };
   approved: boolean;
-}
-
-export interface Conflict {
-  id: number;
-  conflict: boolean;
+  conflict?: boolean;
 }

@@ -153,14 +153,91 @@ describe('App', () => {
 
       const rows = screen.getAllByTestId('absence-item');
 
+      expect(rows[0]).toHaveTextContent('Enya Behm');
+      expect(rows[1]).toHaveTextContent('Amiah Fenton');
+      expect(rows[2]).toHaveTextContent('Rahaf Deckard');
+    });
+
+    it('sorts the table by start date when clicking the Start Date heading', async () => {
+      render(<App />);
+
+      const startDateHeading = await screen.findByText('Start Date');
+      await userEvent.click(startDateHeading);
+
+      const rows = screen.getAllByTestId('absence-item');
+
       expect(rows[0]).toHaveTextContent('Amiah Fenton');
-      expect(rows[1]).toHaveTextContent('Rahaf Deckard');
+      expect(rows[1]).toHaveTextContent('Enya Behm');
+      expect(rows[2]).toHaveTextContent('Rahaf Deckard');
+    });
+
+    it('sorts the table by end date when clicking the End Date heading', async () => {
+      render(<App />);
+
+      const endDateHeading = await screen.findByText('End Date');
+      await userEvent.click(endDateHeading);
+
+      const rows = screen.getAllByTestId('absence-item');
+
+      expect(rows[0]).toHaveTextContent('Amiah Fenton');
+      expect(rows[1]).toHaveTextContent('Enya Behm');
+      expect(rows[2]).toHaveTextContent('Rahaf Deckard');
+    });
+
+    it('toggles the ordering of employee name when clicking the same heading twice', async () => {
+      render(<App />);
+
+      const employeeHeading = await screen.findByText('Employee');
+      await userEvent.click(employeeHeading);
+      await userEvent.click(employeeHeading);
+
+      const rows = screen.getAllByTestId('absence-item');
+
+      expect(rows[0]).toHaveTextContent('Rahaf Deckard');
+      expect(rows[1]).toHaveTextContent('Enya Behm');
+      expect(rows[2]).toHaveTextContent('Amiah Fenton');
+    });
+
+    it('toggles the ordering of absence type when clicking the same heading twice', async () => {
+      render(<App />);
+
+      const absenceTypeHeading = await screen.findByText('Absence Type');
+      await userEvent.click(absenceTypeHeading);
+      await userEvent.click(absenceTypeHeading);
+
+      const rows = screen.getAllByTestId('absence-item');
+
+      expect(rows[0]).toHaveTextContent('Rahaf Deckard');
+      expect(rows[1]).toHaveTextContent('Amiah Fenton');
       expect(rows[2]).toHaveTextContent('Enya Behm');
     });
 
-    it('toggles the ordering when clicking the same heading twice', async () => { 
-      expect(true).toBe(false);
+    it('toggles the ordering of start date when clicking the same heading twice', async () => {
+      render(<App />);
+
+      const startDateHeading = await screen.findByText('Start Date');
+      await userEvent.click(startDateHeading);
+      await userEvent.click(startDateHeading);
+
+      const rows = screen.getAllByTestId('absence-item');
+
+      expect(rows[0]).toHaveTextContent('Rahaf Deckard');
+      expect(rows[1]).toHaveTextContent('Enya Behm');
+      expect(rows[2]).toHaveTextContent('Amiah Fenton');
     });
-  })
-  
+
+    it('toggles the ordering of end date when clicking the same heading twice', async () => {
+      render(<App />);
+
+      const endDateHeading = await screen.findByText('End Date');
+      await userEvent.click(endDateHeading);
+      await userEvent.click(endDateHeading);
+
+      const rows = screen.getAllByTestId('absence-item');
+
+      expect(rows[0]).toHaveTextContent('Rahaf Deckard');
+      expect(rows[1]).toHaveTextContent('Enya Behm');
+      expect(rows[2]).toHaveTextContent('Amiah Fenton');
+    });
+  });
 });

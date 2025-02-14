@@ -11,6 +11,7 @@ const mockAbsenceData: AbsenceData[] = [
     id: 0,
     startDate: '2022-05-28T04:39:06.470Z',
     days: 9,
+    conflict: false,
     absenceType: 'SICKNESS',
     employee: {
       firstName: 'Rahaf',
@@ -23,6 +24,7 @@ const mockAbsenceData: AbsenceData[] = [
     id: 1,
     startDate: '2022-02-08T08:02:47.543Z',
     days: 5,
+    conflict: true,
     absenceType: 'ANNUAL_LEAVE',
     employee: {
       firstName: 'Enya',
@@ -35,6 +37,7 @@ const mockAbsenceData: AbsenceData[] = [
     id: 2,
     startDate: '2020-12-31T03:08:19.146Z',
     days: 18,
+    conflict: false,
     absenceType: 'GARDENING_LEAVE',
     employee: {
       firstName: 'Amiah',
@@ -45,26 +48,10 @@ const mockAbsenceData: AbsenceData[] = [
   },
 ];
 
-const mockConflicts = [
-  {
-    id: 0,
-    conflict: false,
-  },
-  {
-    id: 1,
-    conflict: true,
-  },
-  {
-    id: 2,
-    conflict: false,
-  },
-];
-
 const renderAbsenceTable = (sortMethod = () => {}) => {
   render(
     <AbsenceTable
       absenceData={mockAbsenceData}
-      conflicts={mockConflicts}
       sortTable={sortMethod}
     />
   );
