@@ -3,33 +3,39 @@ import AbsenceTable from './components/AbsenceTable';
 import { AbsenceData } from './types';
 
 import calculateEndDate from './helpers/calculateEndDate';
+import { b } from 'vitest/dist/chunks/suite.BJU7kdY9';
 
 const App = () => {
   const { absencesLoading, absences, setAbsences } = useAbsenceFetch();
   const [sortedBy, setSortedBy] = useState('');
-  const [isAscending, setIsAscending] = useState(false);
+  const [isAscending, setIsAscending] = useState(true);
 
   const handleSort = (key: string) => {
+    const ascendingValue = key === sortedBy ? !isAscending : true;
+
     const sortedAbsences = [...absences].sort((a, b) => {
       let compareValue = 0;
+
       if (key === 'Employee') {
-        compareValue = isAscending
-          ? b.employee.firstName.localeCompare(a.employee.firstName)
-          : a.employee.firstName.localeCompare(b.employee.firstName);
+        compareValue = a.employee.firstName.localeCompare(b.employee.firstName);
       } else if (key === 'Absence Type') {
-        compareValue = isAscending
-          ? b.absenceType.localeCompare(a.absenceType)
-          : a.absenceType.localeCompare(b.absenceType);
+        compareValue = a.absenceType.localeCompare(b.absenceType);
+      } else if (key === 'Start Date') {
+        compareValue =
+          new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
+      } else if (key === 'End Date') {
+        const endDateA = calculateEndDate(a.startDate, a.days);
+        const endDateB = calculateEndDate(b.startDate, b.days);
+        compareValue =
+          new Date(endDateA).getTime() - new Date(endDateB).getTime();
       }
 
-      // do Start Date and End Date
-
-      return compareValue;
+      return ascendingValue ? compareValue : -compareValue;
     });
 
     setAbsences(sortedAbsences);
     setSortedBy(key);
-    setIsAscending(key === sortedBy ? !isAscending : false);
+    setIsAscending(ascendingValue);
   };
 
   return (

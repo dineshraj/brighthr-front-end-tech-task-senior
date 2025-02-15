@@ -54,7 +54,10 @@ const AbsenceTable = ({ absenceData, sortTable }: AbsenceDataProps) => {
 
           const hasConflict = absence.conflict;
           const style = hasConflict ? { backgroundColor: '#f1a5a5' } : {};
-
+          const endDateString = calculateEndDate(
+            absence.startDate,
+            absence.days
+          ).toISOString();
           return (
             <tr key={absence.id} data-testid="absence-item" style={style}>
               <td>
@@ -62,7 +65,7 @@ const AbsenceTable = ({ absenceData, sortTable }: AbsenceDataProps) => {
               </td>
               <td>{absence.absenceType}</td>
               <td>{formatDate(absence.startDate)}</td>
-              <td>{formatDate(calculateEndDate(absence.startDate, absence.days).toISOString())}</td>
+              <td>{formatDate(endDateString)}</td>
               <td>{absence.approved ? 'Yes' : 'Pending'}</td>
             </tr>
           );
