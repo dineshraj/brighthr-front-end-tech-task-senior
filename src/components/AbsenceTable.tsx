@@ -2,8 +2,10 @@ import { AbsenceData } from '../types';
 import calculateEndDate from '../helpers/calculateEndDate';
 
 import '../style/AbsenceTable.css';
+import { Link } from 'react-router-dom';
 interface AbsenceDataProps {
   absenceData: AbsenceData[];
+  employeeId?: string;
   sortTable: (key: string) => void;
 }
 
@@ -31,8 +33,7 @@ const formatDate = (isoDate: string) => {
   return `${day}${daySuffix(day)} ${month} ${year}`;
 };
 
-const AbsenceTable = ({ absenceData, sortTable }: AbsenceDataProps) => {
-
+const AbsenceTable = ({ absenceData, employeeId, sortTable }: AbsenceDataProps) => {
   const sortBy = ({ target }: React.MouseEvent<HTMLTableCellElement>) => {
     const text = (target as HTMLElement).textContent;
     if (text) sortTable(text);
@@ -51,6 +52,7 @@ const AbsenceTable = ({ absenceData, sortTable }: AbsenceDataProps) => {
       </thead>
       <tbody>
         {absenceData.map((absence) => {
+          if (employeeId && absence.employee.id !== employeeId) return null;
 
           const hasConflict = absence.conflict;
           const style = hasConflict ? { backgroundColor: '#f1a5a5' } : {};
@@ -61,7 +63,9 @@ const AbsenceTable = ({ absenceData, sortTable }: AbsenceDataProps) => {
           return (
             <tr key={absence.id} data-testid="absence-item" style={style}>
               <td>
-                {absence.employee.firstName} {absence.employee.lastName}
+                <Link to={`?id=${absence.employee.id}`}>
+                  {absence.employee.firstName} {absence.employee.lastName}
+                </Link>
               </td>
               <td>{absence.absenceType}</td>
               <td>{formatDate(absence.startDate)}</td>

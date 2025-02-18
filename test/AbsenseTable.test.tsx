@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 
 import AbsenceTable from '../src/components/AbsenceTable';
 import { AbsenceData } from '../src/types';
+import { MemoryRouter } from 'react-router-dom';
 
 const mockAbsenceData: AbsenceData[] = [
   {
@@ -50,10 +51,9 @@ const mockAbsenceData: AbsenceData[] = [
 
 const renderAbsenceTable = (sortMethod = () => {}) => {
   render(
-    <AbsenceTable
-      absenceData={mockAbsenceData}
-      sortTable={sortMethod}
-    />
+    <MemoryRouter>
+      <AbsenceTable absenceData={mockAbsenceData} sortTable={sortMethod} />
+    </MemoryRouter>
   );
 };
 
@@ -131,6 +131,34 @@ describe('Table', () => {
       expect(sortMethodMock).toHaveBeenCalledWith('Absence Type');
       expect(sortMethodMock).toHaveBeenCalledWith('Start Date');
       expect(sortMethodMock).toHaveBeenCalledWith('End Date');
+    });
+  });
+
+  describe('Employee links', () => {
+    it('renders the employee names as links', () => {
+      renderAbsenceTable();
+
+      const employeeLinks = screen.getAllByRole('link');
+      expect(employeeLinks).toHaveLength(3);
+    });
+
+    it('goes to the employee page when clicking the link', () => {
+      renderAbsenceTable();
+
+      const employeeLinks = screen.getAllByRole('link');
+
+      expect(employeeLinks[0]).toHaveAttribute(
+        'href',
+        '/?id=2ea05a52-4e31-450d-bbc4-5a6c73167d17'
+      );
+      expect(employeeLinks[1]).toHaveAttribute(
+        'href',
+        '/?id=84502153-69e6-4561-b2de-8f21f97530d3'
+      );
+      expect(employeeLinks[2]).toHaveAttribute(
+        'href',
+        '/?id=6ebff517-f398-4d23-9ed3-a0f14bfa3858'
+      );
     });
   });
 });

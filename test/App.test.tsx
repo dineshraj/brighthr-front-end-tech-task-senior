@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 
 import App from '../src/App';
 import { AbsenceData } from '../src/types';
+import { MemoryRouter } from 'react-router-dom';
 
 const mockAbsenceData: AbsenceData[] = [
   {
@@ -47,6 +48,14 @@ const mockAbsenceData: AbsenceData[] = [
 
 global.fetch = vi.fn();
 
+const renderApp = () => {
+  render(
+    <MemoryRouter>
+      <App />
+    </MemoryRouter>
+  );
+};
+
 describe('App', () => {
   beforeEach(() => {
     vi.spyOn(global, 'fetch')
@@ -75,7 +84,7 @@ describe('App', () => {
   });
 
   it('should render the App', async () => {
-    render(<App />);
+    renderApp();
 
     const appContainer = await screen.findByTestId('app');
     expect(appContainer).toBeInTheDocument();
@@ -83,7 +92,7 @@ describe('App', () => {
 
   describe('absences', () => {
     it('fetches the absence data from the server', async () => {
-      render(<App />);
+      renderApp();
 
       expect(fetch).toHaveBeenCalledWith(
         'https://front-end-kata.brighthr.workers.dev/api/absences'
@@ -95,7 +104,7 @@ describe('App', () => {
   });
   describe('conflicts', () => {
     it('fetches the conflicts for each user', async () => {
-      render(<App />);
+      renderApp();
 
       await waitFor(() => {
         expect(fetch).toHaveBeenCalledWith(
@@ -118,7 +127,7 @@ describe('App', () => {
         json: vi.fn().mockResolvedValue([]),
       } as unknown as Response);
 
-      render(<App />);
+      renderApp();
 
       await waitFor(() => {
         expect(fetch).toHaveBeenCalledWith(
@@ -133,7 +142,7 @@ describe('App', () => {
 
   describe('sorting data', () => {
     it('sorts the table by employee name when clicking the Employee heading', async () => {
-      render(<App />);
+      renderApp();
 
       const employeeHeading = await screen.findByText('Employee');
       await userEvent.click(employeeHeading);
@@ -146,7 +155,7 @@ describe('App', () => {
     });
 
     it('sorts the table by absence type when clicking the Absence Type heading', async () => {
-      render(<App />);
+      renderApp();
 
       const absenceTypeHeading = await screen.findByText('Absence Type');
       await userEvent.click(absenceTypeHeading);
@@ -159,7 +168,7 @@ describe('App', () => {
     });
 
     it('sorts the table by start date when clicking the Start Date heading', async () => {
-      render(<App />);
+      renderApp();
 
       const startDateHeading = await screen.findByText('Start Date');
       await userEvent.click(startDateHeading);
@@ -172,7 +181,7 @@ describe('App', () => {
     });
 
     it('sorts the table by end date when clicking the End Date heading', async () => {
-      render(<App />);
+      renderApp();
 
       const endDateHeading = await screen.findByText('End Date');
       await userEvent.click(endDateHeading);
@@ -185,7 +194,7 @@ describe('App', () => {
     });
 
     it('toggles the ordering of employee name when clicking the same heading twice', async () => {
-      render(<App />);
+      renderApp();
 
       const employeeHeading = await screen.findByText('Employee');
       await userEvent.click(employeeHeading);
@@ -199,7 +208,7 @@ describe('App', () => {
     });
 
     it('toggles the ordering of absence type when clicking the same heading twice', async () => {
-      render(<App />);
+      renderApp();
 
       const absenceTypeHeading = await screen.findByText('Absence Type');
       await userEvent.click(absenceTypeHeading);
@@ -213,7 +222,7 @@ describe('App', () => {
     });
 
     it('toggles the ordering of start date when clicking the same heading twice', async () => {
-      render(<App />);
+      renderApp();
 
       const startDateHeading = await screen.findByText('Start Date');
       await userEvent.click(startDateHeading);
@@ -227,7 +236,7 @@ describe('App', () => {
     });
 
     it('toggles the ordering of end date when clicking the same heading twice', async () => {
-      render(<App />);
+      renderApp();
 
       const endDateHeading = await screen.findByText('End Date');
       await userEvent.click(endDateHeading);
@@ -238,6 +247,92 @@ describe('App', () => {
       expect(rows[0]).toHaveTextContent('Rahaf Deckard');
       expect(rows[1]).toHaveTextContent('Enya Behm');
       expect(rows[2]).toHaveTextContent('Amiah Fenton');
+    });
+  });
+
+  describe('Employee specific page', () => {
+    it('displays only the selected employees when clicked', async () => {
+      const mockAbsenceDataWithDuplicateNames: AbsenceData[] = [
+        {
+          id: 0,
+          startDate: '2022-05-28T04:39:06.470Z',
+          days: 9,
+          absenceType: 'SICKNESS',
+          employee: {
+            firstName: 'Rahaf',
+            lastName: 'Deckard',
+            id: '2ea05a52-4e31-450d-bbc4-5a6c73167d17',
+          },
+          approved: true,
+        },
+        {
+          id: 1,
+          startDate: '2022-03-28T04:39:06.470Z',
+          days: 9,
+          absenceType: 'SICKNESS',
+          employee: {
+            firstName: 'Rahaf',
+            lastName: 'Deckard',
+            id: '2ea05a52-4e31-450d-bbc4-5a6c73167d17',
+          },
+          approved: true,
+        },
+        {
+          id: 1,
+          startDate: '2022-02-08T08:02:47.543Z',
+          days: 5,
+          absenceType: 'ANNUAL_LEAVE',
+          employee: {
+            firstName: 'Enya',
+            lastName: 'Behm',
+            id: '84502153-69e6-4561-b2de-8f21f97530d3',
+          },
+          approved: true,
+        }
+      ];
+
+      vi.spyOn(global, 'fetch')
+        .mockResolvedValueOnce({
+          json: vi.fn().mockResolvedValue(mockAbsenceDataWithDuplicateNames),
+        } as unknown as Response)
+        .mockResolvedValueOnce({
+          json: vi.fn().mockResolvedValue({
+            conflicts: true,
+          }),
+        } as unknown as Response)
+        .mockResolvedValueOnce({
+          json: vi.fn().mockResolvedValue({
+            conflicts: false,
+          }),
+        } as unknown as Response)
+        .mockResolvedValueOnce({
+          json: vi.fn().mockResolvedValue({
+            conflicts: false,
+          }),
+        } as unknown as Response);
+      
+      renderApp();
+
+      const employeeLink = await screen.findAllByText('Rahaf Deckard');
+      await userEvent.click(employeeLink[0]);
+
+      const absenceTable = screen.getByTestId('absences');
+
+      expect(absenceTable).toBeInTheDocument();
+
+      expect(screen.getAllByTestId('absence-item')).toHaveLength(2);
+      expect(screen.getAllByText('Rahaf Deckard')).toHaveLength(2);
+    });
+
+    it('renders a back button to return to the full table', async () => {
+      renderApp();
+
+      const employeeLink = await screen.findAllByText('Rahaf Deckard');
+      await userEvent.click(employeeLink[0]);
+
+      const backButton = await screen.findByText('Back');
+
+      expect(backButton).toBeInTheDocument();
     });
   });
 });

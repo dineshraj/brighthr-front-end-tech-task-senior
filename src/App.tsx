@@ -1,16 +1,19 @@
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import AbsenceTable from './components/AbsenceTable';
 import { AbsenceData } from './types';
 
+
 import calculateEndDate from './helpers/calculateEndDate';
-import { b } from 'vitest/dist/chunks/suite.BJU7kdY9';
 
 const App = () => {
   const { absencesLoading, absences, setAbsences } = useAbsenceFetch();
   const [sortedBy, setSortedBy] = useState('');
   const [isAscending, setIsAscending] = useState(true);
+  const employeeId = useSelectEmployee();
 
   const handleSort = (key: string) => {
+    // should this be in a useCallback?
     const ascendingValue = key === sortedBy ? !isAscending : true;
 
     const sortedAbsences = [...absences].sort((a, b) => {
@@ -38,15 +41,34 @@ const App = () => {
     setIsAscending(ascendingValue);
   };
 
+  /*
+    How do I stop the data from re-fetching when I click the back button
+  */
+
   return (
     <div data-testid="app">
       {absencesLoading && <p>Loading...</p>}
       {!absencesLoading && (
-        <AbsenceTable absenceData={absences} sortTable={handleSort} />
+        <AbsenceTable absenceData={absences} sortTable={handleSort} employeeId={employeeId}  />
       )}
+      {employeeId && <a href='/'>Back</a>}
     </div>
   );
 };
+
+const useSelectEmployee = () => {
+  const location = useLocation();
+  const [selectedEmployee, setSelectedEmployee] = useState('');
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const employeeId = params.get('id') || '';
+    setSelectedEmployee(employeeId);
+
+   }, [location.search]);
+
+  return selectedEmployee;
+}
 
 const useAbsenceFetch = () => {
   const [absences, setAbsences] = useState<AbsenceData[]>([]);
