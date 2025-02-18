@@ -288,7 +288,7 @@ describe('App', () => {
             id: '84502153-69e6-4561-b2de-8f21f97530d3',
           },
           approved: true,
-        }
+        },
       ];
 
       vi.spyOn(global, 'fetch')
@@ -310,7 +310,7 @@ describe('App', () => {
             conflicts: false,
           }),
         } as unknown as Response);
-      
+
       renderApp();
 
       const employeeLink = await screen.findAllByText('Rahaf Deckard');
@@ -325,12 +325,75 @@ describe('App', () => {
     });
 
     it('renders a back button to return to the full table', async () => {
+      const mockAbsenceDataWithDuplicateNames: AbsenceData[] = [
+        {
+          id: 0,
+          startDate: '2022-05-28T04:39:06.470Z',
+          days: 9,
+          absenceType: 'SICKNESS',
+          employee: {
+            firstName: 'Rahaf',
+            lastName: 'Deckard',
+            id: '2ea05a52-4e31-450d-bbc4-5a6c73167d17',
+          },
+          approved: true,
+        },
+        {
+          id: 1,
+          startDate: '2022-03-28T04:39:06.470Z',
+          days: 9,
+          absenceType: 'SICKNESS',
+          employee: {
+            firstName: 'Rahaf',
+            lastName: 'Deckard',
+            id: '2ea05a52-4e31-450d-bbc4-5a6c73167d17',
+          },
+          approved: true,
+        },
+        {
+          id: 1,
+          startDate: '2022-02-08T08:02:47.543Z',
+          days: 5,
+          absenceType: 'ANNUAL_LEAVE',
+          employee: {
+            firstName: 'Enya',
+            lastName: 'Behm',
+            id: '84502153-69e6-4561-b2de-8f21f97530d3',
+          },
+          approved: true,
+        },
+      ];
+
+      vi.spyOn(global, 'fetch')
+        .mockResolvedValueOnce({
+          json: vi.fn().mockResolvedValue(mockAbsenceDataWithDuplicateNames),
+        } as unknown as Response)
+        .mockResolvedValueOnce({
+          json: vi.fn().mockResolvedValue({
+            conflicts: true,
+          }),
+        } as unknown as Response)
+        .mockResolvedValueOnce({
+          json: vi.fn().mockResolvedValue({
+            conflicts: false,
+          }),
+        } as unknown as Response)
+        .mockResolvedValueOnce({
+          json: vi.fn().mockResolvedValue({
+            conflicts: false,
+          }),
+        } as unknown as Response);
+
       renderApp();
+
+      let backButton = screen.queryByText('Back');
+
+      expect(backButton).not.toBeInTheDocument();
 
       const employeeLink = await screen.findAllByText('Rahaf Deckard');
       await userEvent.click(employeeLink[0]);
 
-      const backButton = await screen.findByText('Back');
+      backButton = screen.getByText('Back');
 
       expect(backButton).toBeInTheDocument();
     });

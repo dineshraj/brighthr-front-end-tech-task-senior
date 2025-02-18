@@ -52,7 +52,7 @@ const mockAbsenceData: AbsenceData[] = [
 const renderAbsenceTable = (sortMethod = () => {}) => {
   render(
     <MemoryRouter>
-      <AbsenceTable absenceData={mockAbsenceData} sortTable={sortMethod} />
+      <AbsenceTable absenceData={mockAbsenceData} sortTable={sortMethod} employeeId='' />
     </MemoryRouter>
   );
 };
@@ -142,7 +142,7 @@ describe('Table', () => {
       expect(employeeLinks).toHaveLength(3);
     });
 
-    it('goes to the employee page when clicking the link', () => {
+    it('links have the right id', () => {
       renderAbsenceTable();
 
       const employeeLinks = screen.getAllByRole('link');

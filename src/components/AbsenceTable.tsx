@@ -3,9 +3,11 @@ import calculateEndDate from '../helpers/calculateEndDate';
 
 import '../style/AbsenceTable.css';
 import { Link } from 'react-router-dom';
+import AbsenceTableHeading from './AbsenceTableHeading';
+import AbsenceTableRow from './AbsenceTableRow';
 interface AbsenceDataProps {
   absenceData: AbsenceData[];
-  employeeId?: string;
+  employeeId: string;
   sortTable: (key: string) => void;
 }
 
@@ -33,7 +35,11 @@ const formatDate = (isoDate: string) => {
   return `${day}${daySuffix(day)} ${month} ${year}`;
 };
 
-const AbsenceTable = ({ absenceData, employeeId, sortTable }: AbsenceDataProps) => {
+const AbsenceTable = ({
+  absenceData,
+  employeeId,
+  sortTable,
+}: AbsenceDataProps) => {
   const sortBy = ({ target }: React.MouseEvent<HTMLTableCellElement>) => {
     const text = (target as HTMLElement).textContent;
     if (text) sortTable(text);
@@ -41,37 +47,23 @@ const AbsenceTable = ({ absenceData, employeeId, sortTable }: AbsenceDataProps) 
 
   return (
     <table data-testid="absences" className="absences">
-      <thead>
-        <tr>
-          <th onClick={sortBy}>Employee</th>
-          <th onClick={sortBy}>Absence Type</th>
-          <th onClick={sortBy}>Start Date</th>
-          <th onClick={sortBy}>End Date</th>
-          <th onClick={sortBy}>Approved</th>
-        </tr>
-      </thead>
+      <AbsenceTableHeading sortBy={sortBy} />
       <tbody>
         {absenceData.map((absence) => {
-          if (employeeId && absence.employee.id !== employeeId) return null;
-
-          const hasConflict = absence.conflict;
-          const style = hasConflict ? { backgroundColor: '#f1a5a5' } : {};
           const endDateString = calculateEndDate(
             absence.startDate,
             absence.days
           ).toISOString();
+          const formattedStartDate = formatDate(absence.startDate)
+          const formattedEndDate = formatDate(endDateString)
+
           return (
-            <tr key={absence.id} data-testid="absence-item" style={style}>
-              <td>
-                <Link to={`?id=${absence.employee.id}`}>
-                  {absence.employee.firstName} {absence.employee.lastName}
-                </Link>
-              </td>
-              <td>{absence.absenceType}</td>
-              <td>{formatDate(absence.startDate)}</td>
-              <td>{formatDate(endDateString)}</td>
-              <td>{absence.approved ? 'Yes' : 'Pending'}</td>
-            </tr>
+            <AbsenceTableRow
+              absence={absence}
+              employeeId={employeeId}
+              startDate={formattedStartDate}
+              endDate={formattedEndDate}
+            />
           );
         })}
       </tbody>
